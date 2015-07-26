@@ -274,10 +274,6 @@
 			var prop = e.target.getAttribute("stop-propagation");
 			var hash = e.target.getAttribute("change-hash");
 			
-			if (prevent != null){
-				return;
-			}
-
 			if (pDefault != null){
 				e.preventDefault();
 			}
@@ -289,6 +285,14 @@
 			if (hash != null && href != null){
 				window.hash = href;
 			}
+
+			if (prevent != null){
+				return;
+			}
+
+			
+
+			
 
 			if (typeof href !== "undefined"){
 				
@@ -451,6 +455,7 @@
 		}
 
 		MultiLevelSlider.prototype.close = function(){
+			console.log(window.hash);
 			this.state.opened = false;
 			shim.style.display = "none";
 
