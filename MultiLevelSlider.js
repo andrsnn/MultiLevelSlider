@@ -180,6 +180,7 @@
 		prevent: prevents searching for sub nav
 		prevent-default: executes e.preventDefault() on the event
 		stop-propagation: executes e.stopPropagation() on the event
+		change-hash: changes the window.hash property according to href (assumes a elem not used)
 	*/
 	var MultiLevelSlider = function(opts){
 		var zIndexCounter = 1003;
@@ -271,6 +272,7 @@
 			var prevent = e.target.getAttribute("prevent");
 			var pDefault = e.target.getAttribute("prevent-default");
 			var prop = e.target.getAttribute("stop-propagation");
+			var hash = e.target.getAttribute("change-hash");
 			
 			if (prevent != null){
 				return;
@@ -282,6 +284,10 @@
 
 			if (prop != null){
 				e.stopPropagation();
+			}
+
+			if (hash != null && href != null){
+				window.hash = href;
 			}
 
 			if (typeof href !== "undefined"){
@@ -448,7 +454,8 @@
 			this.state.opened = false;
 			shim.style.display = "none";
 
-			if (currNav != slider && historyStack.length == 0){
+			if (currNav != null && currNav != slider && historyStack.length == 0){
+				
 				currNav.classList.add("move-left");
 				currNav.style.removeProperty('transform');
 			}	
