@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>MultiLevelSlider.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>MultiLevelSlider.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">root, factory</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> define === <span class="hljs-string">'function'</span> &amp;&amp; define.amd) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>AMD. Register as an anonymous module.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        define([<span class="hljs-string">'jquery'</span>,<span class="hljs-string">'backbone'</span>,<span class="hljs-string">'require'</span>], factory);
+    } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Browser globals</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        root.amdWeb = factory(root.b);
+    }
+}(<span class="hljs-keyword">this</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">$,Backbone,require</span>) </span>{
+
+	<span class="hljs-keyword">var</span> Generator = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+		Generator.prototype.genMenu = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">opts</span>) </span>{
+			<span class="hljs-keyword">var</span> div = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+			div.className = <span class="hljs-keyword">typeof</span> opts.defaultMenuClasses !== <span class="hljs-string">"undefined"</span> ? opts.defaultMenuClasses : 
+				<span class="hljs-string">"icon-preview slider-menu"</span>;
+			<span class="hljs-keyword">var</span> i = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'i'</span>);
+			i.className = <span class="hljs-string">"mdi-action-list"</span>;
+			div.appendChild(i);
+
+			<span class="hljs-keyword">var</span> ret = opts.menuCreatedCallback &amp;&amp; opts.menuCreatedCallback(div);
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> ret !== <span class="hljs-string">"undefined"</span>){
+				div = ret;
+			}
+			<span class="hljs-keyword">return</span> div;
+		}
+
+
+
+		Generator.prototype.genSlider = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">opts</span>) </span>{
+			<span class="hljs-keyword">var</span> panel = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+			<span class="hljs-keyword">var</span> heading = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+			<span class="hljs-keyword">var</span> content = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+
+			panel.className = <span class="hljs-keyword">typeof</span> opts.defaultSliderClasses !== <span class="hljs-string">"undefined"</span> ? opts.defaultSliderClasses :
+				<span class="hljs-string">"panel panel-default panel-menu-left nav-transitions hide-left"</span>;
+
+			heading.className = <span class="hljs-string">"panel-heading"</span>;
+			content.className = <span class="hljs-string">"panel-body slider-body"</span>;
+
+			panel.appendChild(heading);
+			heading.appendChild(content);
+
+			opts.sliderCreatedCallback &amp;&amp; opts.sliderCreatedCallback(panel, heading, content);
+			
+			<span class="hljs-keyword">return</span> panel;
+
+		}
+
+		Generator.prototype.genShim = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">opts</span>)</span>{
+			<span class="hljs-keyword">var</span> shim = <span class="hljs-built_in">document</span>.createElement(<span class="hljs-string">'div'</span>);
+
+			shim.className = <span class="hljs-keyword">typeof</span> opts.defaultShimClasses !== <span class="hljs-string">"undefined"</span> ? opts.defaultShimClasses :
+				<span class="hljs-string">"shim fade"</span>;
+
+			$(<span class="hljs-string">'body'</span>)[<span class="hljs-number">0</span>].appendChild(shim);
+
+			opts.shimCreatedCallback &amp;&amp; opts.shimCreatedCallback(shim);
+			<span class="hljs-keyword">return</span> shim;
+		}
+	}
+
+	<span class="hljs-keyword">var</span> Navigator = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+		
+		Navigator.prototype.findUpperElem = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">elem, needle, property</span>)</span>{
+        
+        <span class="hljs-keyword">if</span> (elem.tagName === <span class="hljs-string">"BODY"</span>){
+          <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        }
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> elem.parentNode === <span class="hljs-string">"undefined"</span>){
+          <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+        }
+        <span class="hljs-keyword">var</span> nextElem = $(elem).next()[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> nextElem === <span class="hljs-string">"undefined"</span>){
+          nextElem = elem;
+        }
+        <span class="hljs-keyword">if</span> (property){
+        	<span class="hljs-keyword">if</span> (nextElem[property] !== needle){
+          		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.findNextElem(nextElem.parentNode, needle,property);
+	        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>must equal needle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	        <span class="hljs-keyword">else</span>{
+	          <span class="hljs-keyword">return</span> nextElem;
+	        }
+        }
+        <span class="hljs-keyword">else</span> {
+        	<span class="hljs-keyword">if</span> (nextElem.tagName !== needle){
+          		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.findNextElem(nextElem.parentNode, needle);
+	        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>must equal needle</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	        <span class="hljs-keyword">else</span>{
+	          <span class="hljs-keyword">return</span> nextElem;
+	        }
+        }
+        
+      }
+      
+      Navigator.prototype.findNextElem = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">elem, needle</span>)</span>{
+      	<span class="hljs-keyword">var</span> ret = <span class="hljs-literal">null</span>;
+      	<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; elem.children.length; i++) {
+      		<span class="hljs-keyword">if</span> (elem.children[i].tagName == needle){
+      			ret = elem.children[i];
+      		}
+      	}
+      	<span class="hljs-keyword">return</span> ret;
+      }
+
+      Navigator.prototype.BFS = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">start, needle</span>)</span>{
+
+      	<span class="hljs-keyword">var</span> q = [];
+      	q.push(start);
+      	
+      	<span class="hljs-keyword">while</span> (q.length != <span class="hljs-number">0</span>){
+      		<span class="hljs-keyword">var</span> elem = q.shift();
+      		
+      		<span class="hljs-keyword">var</span> href = elem.href || elem.getAttribute(<span class="hljs-string">"href"</span>);
+      		<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">typeof</span> href !== <span class="hljs-string">"undefined"</span> || href != <span class="hljs-literal">null</span>)
+      			&amp;&amp; href == needle){
+      			<span class="hljs-keyword">return</span> elem;
+      		}
+      		<span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; elem.children.length; i++) {
+      			q.push(elem.children[i]);
+      		}
+			
+
+      	}
+      	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      	
+  	}
+
+
+  }
+
+	
+
+	<span class="hljs-keyword">var</span> HistoryItem = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">href,nav</span>)</span>{
+		<span class="hljs-keyword">this</span>.href = href;
+		<span class="hljs-keyword">this</span>.nav = nav;
+	}
+	<span class="hljs-comment">/*
+	{	
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>if menu is supplied, menuCreatedCallback is not called as menu is not generated</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		menu: selector / dom elem</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		slider: selector / dom elem</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>shim when menu is open</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		shim: selector / dom elem</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>menu classes to apply on default</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		defaultMenuClasses: <span class="hljs-built_in">String</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>slider classes to apply on default</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		defaultSliderClasses: <span class="hljs-built_in">String</span>
+
+		defaultShimClasses: <span class="hljs-built_in">String</span>
+
+		defaultShimFadeClass: <span class="hljs-built_in">String</span>
+
+		defaultShimFadeOpacity: Float
+
+		defaultTransformX: Int</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>slider transitions classes to apply on default</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		defaultSliderTransitionClasses: <span class="hljs-built_in">String</span> / <span class="hljs-keyword">default</span>: nav-transition</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>called before slider is created, before attach to body</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		sliderCreatedCallback: <span class="hljs-function"><span class="hljs-keyword">function</span>,
+
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>called before menu is created, before attach to body</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		menuCreatedCallback: <span class="hljs-function"><span class="hljs-keyword">function</span>
+	
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>called when shim is created, before attach to body</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		shimCreatedCallback: <span class="hljs-function"><span class="hljs-keyword">function</span>
+
+
+	}
+
+	<span class="hljs-title">Button</span> <span class="hljs-title">attributes</span>:
+		<span class="hljs-title">prevent</span>: <span class="hljs-title">prevents</span> <span class="hljs-title">searching</span> <span class="hljs-title">for</span> <span class="hljs-title">sub</span> <span class="hljs-title">nav</span>
+		<span class="hljs-title">prevent</span>-<span class="hljs-title">default</span>: <span class="hljs-title">executes</span> <span class="hljs-title">e</span>.<span class="hljs-title">preventDefault</span>(<span class="hljs-params"></span>) <span class="hljs-title">on</span> <span class="hljs-title">the</span> <span class="hljs-title">event</span>
+		<span class="hljs-title">stop</span>-<span class="hljs-title">propagation</span>: <span class="hljs-title">executes</span> <span class="hljs-title">e</span>.<span class="hljs-title">stopPropagation</span>(<span class="hljs-params"></span>) <span class="hljs-title">on</span> <span class="hljs-title">the</span> <span class="hljs-title">event</span>
+	*/
+	<span class="hljs-title">var</span> <span class="hljs-title">MultiLevelSlider</span> = <span class="hljs-title">function</span>(<span class="hljs-params">opts</span>)</span>{
+		<span class="hljs-keyword">var</span> zIndexCounter = <span class="hljs-number">1003</span>;
+		<span class="hljs-keyword">var</span> currNav = <span class="hljs-literal">null</span>;
+		<span class="hljs-keyword">var</span> historyStack = [];
+
+		<span class="hljs-keyword">var</span> dontAppendMenu = <span class="hljs-literal">false</span>;
+		<span class="hljs-keyword">var</span> dontAppendSlider = <span class="hljs-literal">false</span>;
+		<span class="hljs-keyword">var</span> dontAppendShim = <span class="hljs-literal">false</span>;
+
+		<span class="hljs-keyword">var</span> generator = <span class="hljs-keyword">new</span> Generator();
+		<span class="hljs-keyword">var</span> navigator = <span class="hljs-keyword">new</span> Navigator();
+
+		<span class="hljs-keyword">var</span> defaultTransformX = <span class="hljs-keyword">typeof</span> opts.defaultTransformX !== <span class="hljs-string">"undefined"</span> ? opts.defaultTransformX + <span class="hljs-string">"px"</span> :
+			<span class="hljs-string">"250px"</span>;
+
+		<span class="hljs-keyword">this</span>.state = {
+			opened: <span class="hljs-literal">false</span>
+		};
+
+		opts = opts || {};
+
+		<span class="hljs-keyword">var</span> menu = <span class="hljs-keyword">typeof</span> opts.menu !== <span class="hljs-string">"undefined"</span> ? opts.menu : generator.genMenu(opts);
+
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> menu === <span class="hljs-string">"string"</span>){
+			dontAppendMenu = <span class="hljs-literal">true</span>;
+			menu = $(menu)[<span class="hljs-number">0</span>];
+		}
+
+		<span class="hljs-keyword">var</span> slider = <span class="hljs-keyword">typeof</span> opts.slider !== <span class="hljs-string">"undefined"</span> ? opts.slider : generator.genSlider(opts);
+
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> slider === <span class="hljs-string">"string"</span>){
+			dontAppendSlider = <span class="hljs-literal">true</span>;
+			slider = $(slider)[<span class="hljs-number">0</span>];
+		}
+
+		<span class="hljs-keyword">var</span> shim = <span class="hljs-keyword">typeof</span> opts.shim !== <span class="hljs-string">"undefined"</span> ? opts.shim : generator.genShim(opts);
+
+		<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> shim === <span class="hljs-string">"string"</span>){
+			dontAppendShim = <span class="hljs-literal">true</span>;
+			shim = $(shim)[<span class="hljs-number">0</span>];
+		}
+
+		<span class="hljs-keyword">var</span> body = $(<span class="hljs-string">'body'</span>)[<span class="hljs-number">0</span>];
+
+		<span class="hljs-keyword">if</span> (!dontAppendMenu){
+			body.appendChild(menu);
+		}
+
+		<span class="hljs-keyword">if</span> (!dontAppendSlider){
+			body.appendChild(slider);
+		}
+
+		<span class="hljs-keyword">if</span> (!dontAppendShim){
+			body.appendChild(shim);
+		}
+
+		slider.style.zIndex = zIndexCounter;
+		zIndexCounter++;
+
+		shim.style.display = <span class="hljs-string">"none"</span>;
+
+		<span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>listeners</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		menu.addEventListener(<span class="hljs-string">"click"</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+			e.stopPropagation();
+			self.open();
+		},<span class="hljs-literal">false</span>);
+
+		shim.addEventListener(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+			e.stopPropagation();
+			
+			self.close();
+			slider.addEventListener(<span class="hljs-string">"transitionend"</span>,<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+				
+				self.reset();
+				
+				slider.removeEventListener(<span class="hljs-string">"transitionend"</span>,<span class="hljs-built_in">arguments</span>.callee);
+			},<span class="hljs-literal">false</span>);
+			
+		}, <span class="hljs-literal">false</span>);
+
+		
+		slider.addEventListener(<span class="hljs-string">"click"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>)</span>{
+			e.stopPropagation();
+			
+			<span class="hljs-keyword">var</span> href = e.target.href || e.target.getAttribute(<span class="hljs-string">"href"</span>);
+			<span class="hljs-keyword">var</span> prevent = e.target.getAttribute(<span class="hljs-string">"prevent"</span>);
+			<span class="hljs-keyword">var</span> pDefault = e.target.getAttribute(<span class="hljs-string">"prevent-default"</span>);
+			<span class="hljs-keyword">var</span> prop = e.target.getAttribute(<span class="hljs-string">"stop-propagation"</span>);
+			
+			<span class="hljs-keyword">if</span> (prevent != <span class="hljs-literal">null</span>){
+				<span class="hljs-keyword">return</span>;
+			}
+
+			<span class="hljs-keyword">if</span> (pDefault != <span class="hljs-literal">null</span>){
+				e.preventDefault();
+			}
+
+			<span class="hljs-keyword">if</span> (prop != <span class="hljs-literal">null</span>){
+				e.stopPropagation();
+			}
+
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> href !== <span class="hljs-string">"undefined"</span>){
+				
+				<span class="hljs-keyword">if</span> (href == <span class="hljs-literal">null</span>){
+					<span class="hljs-keyword">return</span>;
+				}
+				href = href.replace(<span class="hljs-string">"#"</span>,<span class="hljs-string">""</span>);
+				<span class="hljs-keyword">if</span> (href == <span class="hljs-string">"Back"</span> || href == <span class="hljs-string">"back"</span>){
+					self.back();
+				}
+				<span class="hljs-keyword">else</span> {
+					self.forward(e.target,href);
+				}
+			}
+		},<span class="hljs-literal">false</span>);
+
+
+		MultiLevelSlider.prototype.forward = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">elem,href,override</span>)</span>{
+			
+			<span class="hljs-keyword">var</span> nextElem = navigator.findNextElem(elem, <span class="hljs-string">"NAV"</span>);
+			<span class="hljs-keyword">if</span> (nextElem == <span class="hljs-literal">null</span>){
+				<span class="hljs-built_in">console</span>.warn(<span class="hljs-string">"No child NAV found at "</span>, elem);
+				<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+			}
+
+			<span class="hljs-keyword">if</span> (currNav == <span class="hljs-literal">null</span> &amp;&amp; !override){
+				currNav = slider;
+				<span class="hljs-keyword">var</span> historyItem = <span class="hljs-keyword">new</span> HistoryItem(href, currNav);
+				historyStack.push(historyItem);
+			}
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!override){
+				<span class="hljs-keyword">var</span> historyItem = <span class="hljs-keyword">new</span> HistoryItem(href, currNav);
+				historyStack.push(historyItem);
+			}
+			
+
+
+		
+
+			
+
+			nextElem.classList.remove(<span class="hljs-string">"move-left"</span>);
+			<span class="hljs-keyword">if</span> (override){
+				nextElem.style.transform = <span class="hljs-string">"translateX("</span>+defaultTransformX+<span class="hljs-string">")"</span>;
+			}
+
+			
+			nextElem.style.zIndex = zIndexCounter;
+			zIndexCounter++;
+
+			currNav = nextElem;
+
+			
+
+		}
+
+		MultiLevelSlider.prototype.back = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+			zIndexCounter--;
+
+			<span class="hljs-comment">/*
+			var nextElem = navigator.findUpperElem(elem,"NAV");
+			if (nextElem == null){
+				console.warn("No upper NAV found at ", elem);
+				return false;
+			}
+			*/</span>
+
+			<span class="hljs-keyword">var</span> historyItem = historyStack.pop();
+			
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> historyItem !== <span class="hljs-string">"undefined"</span>){
+				currNav.classList.add(<span class="hljs-string">"move-left"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>currNav.classList.toggle(“hidden-nav”);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+				currNav = historyItem.nav;
+			}
+			<span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">this</span>.reset();
+				<span class="hljs-keyword">this</span>.close();
+			}
+
+			
+
+
+		}
+
+		MultiLevelSlider.prototype.reset = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+			
+			
+			<span class="hljs-keyword">while</span> (historyStack.length != <span class="hljs-number">0</span>){
+				zIndexCounter--;
+				<span class="hljs-keyword">var</span> hist = historyStack.pop();
+				<span class="hljs-keyword">if</span> (hist.nav == slider){
+
+				}
+				<span class="hljs-keyword">else</span> {
+					hist.nav.classList.add(<span class="hljs-string">"move-left"</span>);
+				}
+			}
+			<span class="hljs-keyword">if</span> (currNav != <span class="hljs-literal">null</span>){
+				<span class="hljs-keyword">if</span> (currNav != slider){
+					currNav.style.removeProperty(<span class="hljs-string">'transform'</span>);
+					
+				}
+				currNav.classList.add(<span class="hljs-string">"move-left"</span>);
+				currNav = <span class="hljs-literal">null</span>;	
+			}
+			
+		}
+
+		MultiLevelSlider.prototype.goTo = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">id</span>)</span>{
+			<span class="hljs-keyword">var</span> elem = navigator.BFS(slider,id);
+			<span class="hljs-keyword">if</span> (elem){
+				
+				<span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.state.opened){
+					<span class="hljs-keyword">this</span>.open(<span class="hljs-literal">false</span>);
+					
+					<span class="hljs-keyword">var</span> href = elem.href || elem.getAttribute(<span class="hljs-string">"href"</span>);
+					href = href.replace(<span class="hljs-string">"#"</span>,<span class="hljs-string">""</span>);
+
+					
+					<span class="hljs-keyword">this</span>.forward(elem,href,<span class="hljs-literal">true</span>);
+					
+					
+				}
+				<span class="hljs-keyword">else</span> {
+					<span class="hljs-comment">/*
+					var href = elem.href || elem.getAttribute("href");
+					href = href.replace("#","");
+
+					this.forward(elem,href);
+					*/</span>
+				}
+				
+			}
+			<span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(id + <span class="hljs-string">" not found."</span>);
+				
+			}
+		}
+
+
+
+		MultiLevelSlider.prototype.add = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+
+		}
+
+		MultiLevelSlider.prototype.open = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">root</span>)</span>{
+			<span class="hljs-keyword">this</span>.state.opened = <span class="hljs-literal">true</span>;
+			
+			<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> root === <span class="hljs-string">"undefined"</span> || root === <span class="hljs-literal">true</span>){
+				slider.classList.toggle(<span class="hljs-string">"move-left"</span>);		
+			}
+			
+			
+			
+			shim.style.display = <span class="hljs-string">"block"</span>;
+			shim.style.opacity = opts.defaultShimFadeOpacity || <span class="hljs-string">".5"</span>;
+
+		}
+
+		MultiLevelSlider.prototype.close = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)</span>{
+			<span class="hljs-keyword">this</span>.state.opened = <span class="hljs-literal">false</span>;
+			shim.style.display = <span class="hljs-string">"none"</span>;
+
+			<span class="hljs-keyword">if</span> (currNav != slider &amp;&amp; historyStack.length == <span class="hljs-number">0</span>){
+				currNav.classList.add(<span class="hljs-string">"move-left"</span>);
+				currNav.style.removeProperty(<span class="hljs-string">'transform'</span>);
+			}	
+			<span class="hljs-keyword">else</span> {
+				slider.classList.add(<span class="hljs-string">"move-left"</span>);	
+			}
+
+			
+			shim.style.opacity = <span class="hljs-string">"0"</span>;
+		}
+		<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>;
+	}
+	<span class="hljs-keyword">return</span> MultiLevelSlider;
+}));</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
